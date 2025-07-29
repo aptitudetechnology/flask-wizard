@@ -1,79 +1,103 @@
-flask wizard readme
+# {app_title}
 
-f you just ran the wizard, navigate into the created directory:
-Bash
+## Overview ###
+{description}
 
+This project was generated using the Flask App Generator Wizard.
+
+## Features
+* **Modular Structure**: Organized into blueprints for clean code management.
+* **Database**: SQLite3 (lightweight, file-based database) or PostgreSQL ready (with SQLite fallback for development).
+* **Front-end**: Responsive UI with Bootstrap 5 and Bootstrap Icons.
+* **Configuration**: Environment variable based configuration using `.env`.
+* **Logging**: Basic application logging to console and file.
+
+### Selected Features:
+* **User Authentication**: Yes/No
+* **File Upload Handling**: Yes/No
+* **REST API Endpoints**: Yes/No
+* **Background Task Support**: Yes/No
+
+---
+
+## Getting Started
+
+### 1. Clone the repository (or extract the generated app)
+```bash
+# If this was a git repo, you'd clone it
+# git clone [https://github.com/your-repo/](https://github.com/your-repo/){app_name}.git
+# cd {app_name}
+
+# If you just ran the wizard, navigate into the created directory:
 cd {app_name}
+```
 
-2. Set up a virtual environment
-
+### 2. Set up a virtual environment
 It's highly recommended to use a virtual environment to manage dependencies.
-Bash
-
+```bash
 python3 -m venv venv
-source venv/bin/activate  # On Windows use `venv\\Scripts\\activate`
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
 
-3. Install dependencies
-
-Bash
-
+### 3. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-4. Configure environment variables
-
+### 4. Configure environment variables
 Create a .env file in the root of the project based on .env.example.
-
+```ini
 # .env
-SECRET_KEY='your_super_secret_key_here'
+SECRET_KEY='your_super_secret_key_here_CHANGE_THIS'
 FLASK_ENV='development' # or 'production'
 # DATABASE_URL='postgresql://user:password@host:port/database_name' # Uncomment and configure for PostgreSQL
+```
 
-5. Run the application
-
-Bash
-
+### 5. Run the application
+```bash
 python app.py
-
+```
 The application should now be running at http://127.0.0.1:5000/.
 
-Project Structure
-
+## Project Structure
+```
 {app_name}/
-├── .env                # Environment variables (copied from .env.example)
-├── app.py              # Main Flask application file
-├── paths.py            # Centralized path management
-├── requirements.txt    # Python dependencies
-├── README.md           # This file
+├── .env                  # Environment variables (copied from .env.example)
+├── app.py                # Main Flask application file
+├── paths.py              # Centralized path management
+├── requirements.txt      # Python dependencies
+├── README.md             # This file
 ├── static/
 │   ├── css/
-│   │   └── custom.css  # Custom CSS styles
+│   │   └── custom.css    # Custom CSS styles
 │   ├── js/
-│   │   └── app.js      # Custom JavaScript
-│   ├── uploads/        # Directory for file uploads
-│   └── images/         # Directory for static images
+│   │   └── app.js        # Custom JavaScript
+│   ├── uploads/          # Directory for file uploads
+│   └── images/           # Directory for static images
 ├── templates/
-│   ├── base.html       # Base Jinja2 template
-│   ├── dashboard.html  # Main dashboard page
-│   ├── error.html      # Error page template
-│   └── (other_nav_item_templates).html
-├── routes/             # Flask Blueprints for organized routing
-│   ├── __init__.py     # Registers blueprints
-│   ├── main.py         # Main application routes
-│   └── api.py          # REST API routes
-├── utils/              # Helper functions and utilities
-│   ├── __init__.py     # Initializes utilities
-│   ├── database.py     # Database connection and helper functions
-│   ├── helpers.py      # General utility functions
-│   └── validators.py   # Data validation functions
-├── logs/               # Application logs
-└── data/               # Database and other data files
-    ├── database.db     # SQLite database file (if used)
-    └── backups/        # Database backups
+│   ├── base.html         # Base Jinja2 template
+│   ├── dashboard.html    # Main dashboard page
+│   ├── error.html        # Error page template
+│   └── (other_nav_item_templates).html  # Templates for custom navigation items
+├── routes/               # Flask Blueprints for organized routing
+│   ├── __init__.py       # Registers blueprints
+│   ├── main.py           # Main application routes
+│   └── api.py            # REST API routes
+├── utils/                # Helper functions and utilities
+│   ├── __init__.py       # Initializes utilities
+│   ├── database.py       # Database connection and helper functions
+│   ├── helpers.py        # General utility functions
+│   └── validators.py     # Data validation functions
+├── logs/                 # Application logs
+└── data/                 # Database and other data files
+    ├── database.db       # SQLite database file (if used)
+    └── backups/          # Database backups
+```
 
-Contributing
+## Contributing
+Feel free to extend and customize this application. Contributions, issues, and feature requests are welcome!
 
-Feel free to extend and customize this application.
+## License
+This project is licensed under the AGPL License - see the LICENSE.md file for details (if you have one).
 
-License
-
-AGPL
+*Generated by Flask App Generator Wizard on July 29, 2025*
