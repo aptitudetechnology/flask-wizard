@@ -12,21 +12,27 @@ def generate_requirements_content(config: dict) -> str:
         "python-dotenv",  # For loading environment variables
     ]
     
-    if config['features']['database'] == 'postgres_ready':
+    features = config.get('features', {})
+    database = features.get('database', 'sqlite')
+    if database == 'postgres_ready':
         requirements.append("Flask-SQLAlchemy")
         requirements.append("psycopg2-binary")  # PostgreSQL adapter
     
     # Add other common libraries if selected, or if they're generally useful
-    if config['features']['features']['user_auth']:
+    nested = features.get('features', {})
+    user_auth = features.get('user_auth', nested.get('user_auth', False))
+    if user_auth:
         requirements.append("Werkzeug")  # For password hashing
         # Could add Flask-Login, Flask-WTF if more complex auth is desired
     
-    if config['features']['features']['file_uploads']:
+    file_uploads = features.get('file_uploads', nested.get('file_uploads', False))
+    if file_uploads:
         # Consider specific libraries if more robust file handling is needed,
         # otherwise basic Flask handles it.
         pass
     
-    if config['features']['features']['background_tasks']:
+    background_tasks = features.get('background_tasks', nested.get('background_tasks', False))
+    if background_tasks:
         requirements.append("celery")
         requirements.append("redis")  # Common broker for Celery
     
@@ -41,12 +47,12 @@ def generate_readme_content(config: dict) -> str:
     current_year = datetime.now().year
     
     # Database description
-    db_desc = 'PostgreSQL ready (with SQLite fallback for development)' if config['features']['database'] == 'postgres_ready' else 'SQLite3 (lightweight, file-based database)'
+    db_desc = 'PostgreSQL ready (with SQLite fallback for development)' if database == 'postgres_ready' else 'SQLite3 (lightweight, file-based database)'
     
     # Feature selections
-    user_auth = 'Yes' if config['features']['features']['user_auth'] else 'No'
-    file_uploads = 'Yes' if config['features']['features']['file_uploads'] else 'No'
-    api_endpoints = 'Yes' if config['features']['features']['api_endpoints'] else 'No'
+    user_auth = 'Yes' if user_auth else 'No'
+    file_uploads = 'Yes' if file_uploads else 'No'
+    api_endpoints = 'Yes' if features.get('api_endpoints', nested.get('api_endpoints', False)) else 'No'
     background_tasks = 'Yes' if config['features']['features']['background_tasks'] else 'No'
     
     readme_content = '''# ''' + app_title + '''

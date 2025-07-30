@@ -90,7 +90,8 @@ def submit_feedback():
 def generate_api_routes_content(config: dict) -> str:
     """Generate api.py file content for REST API endpoints."""
     app_title = config['app_title']
-    include_api_data_endpoint = config['features']['api_endpoints']
+    features = config.get('features', {})
+    include_api_data_endpoint = features.get('api_endpoints', False)
 
     api_routes = '''"""
 API routes for REST endpoints

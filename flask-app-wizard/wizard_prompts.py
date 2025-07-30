@@ -186,9 +186,10 @@ def confirm_config(config: dict) -> bool:
     print(f"Title: {config['app_title']}")
     print(f"Author: {config['author']}")
     
-    print(f"Database: {config['features']['database']}")
+    features = config.get('features', {})
+    print(f"Database: {features.get('database', 'sqlite')}")
     feature_keys = ['user_auth', 'file_uploads', 'api_endpoints', 'background_tasks']
-    selected_features = [k.replace('_', ' ').title() for k in feature_keys if config['features'].get(k, False)]
+    selected_features = [k.replace('_', ' ').title() for k in feature_keys if features.get(k, False)]
     
     print(f"Navigation items: {len(config['nav_items'])}")
     

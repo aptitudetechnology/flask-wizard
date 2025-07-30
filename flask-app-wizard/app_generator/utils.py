@@ -18,8 +18,9 @@ from .validators import validate_email, validate_filename
 def generate_database_utils_content(config: dict) -> str:
     """Generate database.py file content."""
     app_title = config['app_title']
-    use_user_auth = config['features']['user_auth']
-    db_type = config['features']['database']
+    features = config.get('features', {})
+    use_user_auth = features.get('user_auth', False)
+    db_type = features.get('database', 'sqlite')
 
     if db_type == 'sqlite':
         db_connection_code = '''
