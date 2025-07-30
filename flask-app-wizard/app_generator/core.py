@@ -114,6 +114,7 @@ from routes import register_blueprints
 # Import utilities
 from utils.database import init_db, get_db_connection, get_setting
 from utils.helpers import format_datetime # For general template use
+import json
 
 # Path configuration
 from paths import BASE_DIR, LOGS_DIR
