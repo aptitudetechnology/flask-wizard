@@ -1,6 +1,11 @@
+"""
+Core App Generator Module
+Generates the main app.py file and the paths.py configuration.
+"""
+
+from datetime import datetime
 import json
 import textwrap
-from datetime import datetime
 
 
 def generate_paths_file_content(config: dict) -> str:
@@ -85,17 +90,6 @@ def generate_main_app_content(config: dict) -> str:
     author = config['author']
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    # Get use_postgres from config
-    # Ensure 'features' and 'database' keys exist and handle default if needed
-    use_postgres = config.get('features', {}).get('database', '') == 'PostgreSQL'
-
-    # Process nav_items_indented BEFORE constructing the main f-string
-    nav_items_raw = json.dumps(config['nav_items'], indent=4)
-    # Indent each line by 4 spaces for function body
-    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 4)
-
-    # *** CRITICAL FIX: Use single triple quotes (''') for the outer f-string
-    # to avoid conflict with """ inside the generated content. ***
     return f'''"""
 {app_title}
 {description}
@@ -165,7 +159,7 @@ def server_error(error):
 # Template context processors
 @app.context_processor
 def inject_globals():
-    """Inject global variables and functions into all templates"""
+    \"\"\"Inject global variables and functions into all templates\"\"\"
     nav_items_data = {nav_items_indented}
     return dict(
         nav_items=nav_items_data,
@@ -184,5 +178,11 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     logger.info(f"Starting {{app.config.get('APPLICATION_NAME', '{app_title}')}} on http://0.0.0.0:{{port}}")
+    # Properly indent nav_items JSON for inclusion inside inject_globals()
+    nav_items_raw = json.dumps(config['nav_items'], indent=4)
+    # Indent each line by 4 spaces for function body
+    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 4)
+
+    return f'''"""
     app.run(debug=debug, port=port, host='0.0.0.0')
 '''
