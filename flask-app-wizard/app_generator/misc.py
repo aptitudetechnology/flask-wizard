@@ -237,7 +237,7 @@ APP_NAME=''' + app_name + '''
 APP_TITLE="''' + config['app_title'] + '''"
 
 # File Upload Settings
-''' + ('UPLOAD_FOLDER=static/uploads\nMAX_CONTENT_LENGTH=16777216  # 16MB max file size' if config['features']['features']['file_uploads'] else '# UPLOAD_FOLDER=static/uploads\n# MAX_CONTENT_LENGTH=16777216  # 16MB max file size') + '''
+''' + ('UPLOAD_FOLDER=static/uploads\nMAX_CONTENT_LENGTH=16777216  # 16MB max file size' if config['features']['file_uploads'] else '# UPLOAD_FOLDER=static/uploads\n# MAX_CONTENT_LENGTH=16777216  # 16MB max file size') + '''
 
 # Background Tasks (if enabled)
 ''' + ('CELERY_BROKER_URL=redis://localhost:6379/0\nCELERY_RESULT_BACKEND=redis://localhost:6379/0' if config['features']['features']['background_tasks'] else '# CELERY_BROKER_URL=redis://localhost:6379/0\n# CELERY_RESULT_BACKEND=redis://localhost:6379/0') + '''
