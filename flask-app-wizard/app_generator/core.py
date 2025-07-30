@@ -164,7 +164,7 @@ def server_error(error):
 @app.context_processor
 def inject_globals():
     """Inject global variables and functions into all templates"""
-    nav_items_data = [...]  # actual list of nav items
+    nav_items_json = json.dumps(config['nav_items'], indent=4)
     return dict(
     nav_items=nav_items_data,
     app_title=app.config['APPLICATION_NAME'],
