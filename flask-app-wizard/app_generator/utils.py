@@ -503,7 +503,7 @@ def validate_filename(filename: str) -> bool:
     Checks for characters typically disallowed or problematic in filenames.
     """
     # Disallow path traversal, null bytes, and common forbidden characters
-    if ".." in filename or "/" in filename or "\\" in filename or "\\0" in filename:
+    if ".." in filename or "/" in filename or "\\\\" in filename or "\\\\0" in filename:
         return False
     # Basic check for empty or excessively long names (though sanitize_filename handles length)
     if not filename or len(filename) > 255:
