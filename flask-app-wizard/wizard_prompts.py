@@ -185,11 +185,20 @@ def confirm_config(config: dict) -> bool:
     print(f"App Name: {config['app_name']}")
     print(f"Title: {config['app_title']}")
     print(f"Author: {config['author']}")
-    print(f"Database: {config['features']['database']}")
+    
+    # Handle both the original nested structure (before flattening) and flattened structure
+    if 'features' in config['features']:
+        # Original nested structure from gather_features()
+        print(f"Database: {config['features']['database']}")
+        selected_features = [k.replace('_', ' ').title() for k, v in config['features']['features'].items() if v]
+    else:
+        # Flattened structure from main_wizard.py
+        print(f"Database: {config['features']['database']}")
+        feature_keys = ['user_auth', 'file_uploads', 'api_endpoints', 'background_tasks']
+        selected_features = [k.replace('_', ' ').title() for k in feature_keys if config['features'].get(k, False)]
+    
     print(f"Navigation items: {len(config['nav_items'])}")
     
-    # Show selected features nicely
-    selected_features = [k.replace('_', ' ').title() for k, v in config['features']['features'].items() if v]
     if selected_features:
         print(f"Features: {', '.join(selected_features)}")
     else:
