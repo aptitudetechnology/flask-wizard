@@ -89,11 +89,6 @@ def generate_main_app_content(config: dict) -> str:
     description = config['description']
     author = config['author']
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    use_postgres = config['features']['database'] == 'postgres_ready'
-
-    # Properly indent nav_items JSON for inclusion inside inject_globals()
-    nav_items_raw = json.dumps(config['nav_items'], indent=4)
-    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 8)
 
     return f'''"""
 {app_title}
@@ -183,5 +178,11 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     logger.info(f"Starting {{app.config.get('APPLICATION_NAME', '{app_title}')}} on http://0.0.0.0:{{port}}")
+    # Properly indent nav_items JSON for inclusion inside inject_globals()
+    nav_items_raw = json.dumps(config['nav_items'], indent=4)
+    # Indent each line by 4 spaces for function body
+    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 4)
+
+    return f'''"""
     app.run(debug=debug, port=port, host='0.0.0.0')
 '''
