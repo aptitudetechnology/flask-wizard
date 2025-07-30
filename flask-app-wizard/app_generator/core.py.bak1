@@ -5,8 +5,6 @@ Generates the main app.py file and the paths.py configuration.
 
 from datetime import datetime
 import json
-import textwrap
-
 
 def generate_paths_file_content(config: dict) -> str:
     """Generate paths.py file content for centralized path management."""
@@ -64,6 +62,8 @@ def ensure_directories():
 
 def get_upload_path(filename: str) -> Path:
     """Get safe upload path for a filename"""
+    # Sanitize filename and return full path
+    # Assuming sanitize_filename is available in utils.helpers
     from utils.helpers import sanitize_filename
     safe_filename = sanitize_filename(filename)
     return UPLOADS_DIR / safe_filename
@@ -82,7 +82,6 @@ ensure_directories()
 '''
     return paths_code
 
-
 def generate_main_app_content(config: dict) -> str:
     """Generate the main Flask application file content."""
     app_title = config['app_title']
@@ -90,12 +89,12 @@ def generate_main_app_content(config: dict) -> str:
     author = config['author']
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     use_postgres = config['features']['database'] == 'postgres_ready'
+    use_user_auth = config['features']['user_auth']
 
-    # Properly indent nav_items JSON for inclusion inside inject_globals()
-    nav_items_raw = json.dumps(config['nav_items'], indent=4)
-    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 8)
+    # Handle nav_items JSON serialization properly
+    nav_items_json = json.dumps(config['nav_items'], indent=8)
 
-    return f'''"""
+    app_code = f'''"""
 {app_title}
 {description}
 
@@ -114,7 +113,7 @@ from routes import register_blueprints
 
 # Import utilities
 from utils.database import init_db, get_db_connection, get_setting
-from utils.helpers import format_datetime
+from utils.helpers import format_datetime # For general template use
 import json
 
 # Path configuration
@@ -128,15 +127,15 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-producti
 
 # Configuration
 app.config['APPLICATION_NAME'] = '{app_title}'
-app.config['DATABASE_PATH'] = BASE_DIR / 'data' / 'database.db'
-{'app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///" + str(app.config["DATABASE_PATH"]))' if use_postgres else ''}
+app.config['DATABASE_PATH'] = BASE_DIR / 'data' / 'database.db' # SQLite path
+{'app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///' + '{app.config["DATABASE_PATH"]}")' if use_postgres else ''}
 {'app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False' if use_postgres else ''}
 
 # Initialize extensions
 {'db = SQLAlchemy(app)' if use_postgres else ''}
 
 # Logging setup
-LOGS_DIR.mkdir(parents=True, exist_ok=True)
+LOGS_DIR.mkdir(parents=True, exist_ok=True) # Ensure logs directory exists
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -164,8 +163,11 @@ def server_error(error):
 # Template context processors
 @app.context_processor
 def inject_globals():
-    \"\"\"Inject global variables and functions into all templates\"\"\"
-    nav_items_data = {nav_items_indented}
+    """Inject global variables and functions into all templates"""
+    @app.context_processor
+    def inject_globals():
+    """Inject global variables and functions into all templates"""
+    nav_items_data = {nav_items_json}
     return dict(
         nav_items=nav_items_data,
         app_title=app.config['APPLICATION_NAME'],
@@ -174,10 +176,19 @@ def inject_globals():
         format_datetime=format_datetime
     )
 
+    return dict(
+    nav_items=nav_items_data,
+    app_title=app.config['APPLICATION_NAME'],
+    current_year=datetime.now().year,
+    get_setting=get_setting,
+    format_datetime=format_datetime
+    )
+
 if __name__ == '__main__':
     with app.app_context():
+        # Initialize database tables
         init_db()
-        {'db.create_all()' if use_postgres else ''}
+        {'db.create_all()' if use_postgres else ''} # For SQLAlchemy models
 
     debug = os.environ.get('FLASK_ENV') == 'development'
     port = int(os.environ.get('PORT', 5000))
@@ -185,3 +196,4 @@ if __name__ == '__main__':
     logger.info(f"Starting {{app.config.get('APPLICATION_NAME', '{app_title}')}} on http://0.0.0.0:{{port}}")
     app.run(debug=debug, port=port, host='0.0.0.0')
 '''
+    return app_code
