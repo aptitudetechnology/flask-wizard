@@ -75,7 +75,7 @@ def generate_app_js_content(config: dict) -> str:
     app_title = config['app_title']
     app_js = '''// ''' + app_title + ''' JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('''' + app_title + ''' loaded successfully');
+    console.log("''' + app_title + ''' loaded successfully");
 
     // Auto-hide alerts after 5 seconds
     const alerts = document.querySelectorAll('.alert');
