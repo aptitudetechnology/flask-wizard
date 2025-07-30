@@ -37,25 +37,30 @@ class FlaskWizard:
 
     def run(self):
         """Main wizard flow for generating a Flask application."""
-        print("DEBUG: Entering FlaskWizard.run() method.") # <--- ADD THIS LINE HERE
+        print("DEBUG: Entering FlaskWizard.run() method.")
         print("🧙‍♂️ Flask App Generator Wizard")
         print("=" * 40)
 
         # 1. Gather User Information
         self.config.update(gather_basic_info())
         self.config['nav_items'] = gather_nav_info()
-        features_data = gather_features()
+        
+        features_data_raw = gather_features() # Get the raw data from gather_features
 
-        # Flatten the features structure for compatibility with generators
-        # This ensures 'features' in self.config is structured as expected by content generators
+        # --- START OF MODIFIED SECTION ---
+        # Process features_data_raw into the desired boolean dictionary format
         self.config['features'] = {
-            'database': features_data['database'],
-            'user_auth': features_data['features']['user_auth'],
-            'file_uploads': features_data['features']['file_uploads'],
-            'api_endpoints': features_data['features']['api_endpoints'],
-            'background_tasks': features_data['features']['background_tasks']
+            'database': features_data_raw['database'], # Database selection is likely a string
+            # Check if each feature is present in the list of selected features
+            'user_auth': 'User Auth' in features_data_raw['features'],
+            'file_uploads': 'File Uploads' in features_data_raw['features'],
+            'api_endpoints': 'API Endpoints' in features_data_raw['features'],
+            'background_tasks': 'Background Tasks' in features_data_raw['features']
         }
+        # --- END OF MODIFIED SECTION ---
 
+        # 2. Confirm Configuration
+        # ... (rest of the run method remains the same)
         # 2. Confirm Configuration
         if not confirm_config(self.config):
             print("\nAborted by user. No files were generated.")
