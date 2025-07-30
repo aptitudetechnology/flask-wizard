@@ -1,119 +1,188 @@
-#!/usr/bin/env python3
-"""
-Flask App Generator Wizard - Main Orchestrator
-This script guides the user through creating a new Flask application,
-gathering configuration, and then generating the project files.
-"""
-
-import sys
 import json
-from pathlib import Path
+import textwrap
 from datetime import datetime
 
-# Import modules for different wizard stages
-# Assuming these files are in the same directory as main_wizard.py
-from wizard_prompts import gather_basic_info, gather_nav_info, gather_features, confirm_config
-from file_operations import create_directory_structure, write_file
 
-# Import functions from app_generator package
-# Ensure these modules and functions exist in your app_generator directory
-from app_generator.core import generate_main_app_content, generate_paths_file_content
-from app_generator.routes import generate_routes_init_content, generate_main_routes_content, generate_api_routes_content
-from app_generator.templates import generate_base_template_content, generate_dashboard_template_content, generate_nav_templates_content, generate_error_template_content
-from app_generator.utils import generate_utils_init_content, generate_database_utils_content, generate_helpers_utils_content, generate_validators_utils_content
-from app_generator.static import generate_custom_css_content, generate_app_js_content
-from app_generator.misc import generate_requirements_content, generate_readme_content, generate_env_content
+def generate_paths_file_content(config: dict) -> str:
+    """Generate paths.py file content for centralized path management."""
+    app_title = config['app_title']
+    paths_code = f'''"""
+Path Configuration for {app_title}
+Centralized path management using pathlib
+"""
 
-class FlaskWizard:
-    def __init__(self):
-        self.config = {}
-        # This will be the path to the newly generated Flask app
-        self.app_output_path = None
+from pathlib import Path
 
-    def run(self):
-        """Main wizard flow for generating a Flask application."""
-        print("🧙‍♂️ Flask App Generator Wizard")
-        print("=" * 40)
+# Base application directory
+BASE_DIR = Path(__file__).parent.resolve()
 
-        # 1. Gather User Information
-        self.config.update(gather_basic_info())
-        self.config['nav_items'] = gather_nav_info()
-        features_data = gather_features()
+# Core directories
+TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
+LOGS_DIR = BASE_DIR / "logs"
+ROUTES_DIR = BASE_DIR / "routes"
+UTILS_DIR = BASE_DIR / "utils"
 
-        # Flatten the features structure for compatibility with generators
-        # This ensures 'features' in self.config is structured as expected by content generators
-        self.config['features'] = {
-            'database': features_data['database'],
-            'user_auth': features_data['features']['user_auth'],
-            'file_uploads': features_data['features']['file_uploads'],
-            'api_endpoints': features_data['features']['api_endpoints'],
-            'background_tasks': features_data['features']['background_tasks']
-        }
+# Static subdirectories
+CSS_DIR = STATIC_DIR / "css"
+JS_DIR = STATIC_DIR / "js"
+UPLOADS_DIR = STATIC_DIR / "uploads"
+IMAGES_DIR = STATIC_DIR / "images"
 
-        # 2. Confirm Configuration
-        if not confirm_config(self.config):
-            print("\nAborted by user. No files were generated.")
-            sys.exit(0)
+# Database paths
+DATABASE_DIR = BASE_DIR / "data"
+DATABASE_PATH = DATABASE_DIR / "database.db"
+BACKUP_DIR = DATABASE_DIR / "backups"
 
-        # 3. Generate the Application
-        print(f"\nGenerating Flask app '{self.config['app_name']}'...")
-        self.generate_app()
+# Configuration paths
+ENV_FILE = BASE_DIR / ".env"
+CONFIG_DIR = BASE_DIR / "config"
 
-        print(f"\n✅ Flask app '{self.config['app_name']}' created successfully!")
-        print(f"📁 Location: {self.app_output_path.resolve()}") # Use .resolve() for absolute path
-        print(f"🚀 To run: cd {self.config['app_name']} && python app.py")
-        print("\nDon't forget to create and activate a virtual environment!")
-        print("Example: python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt")
+# Log file paths
+APP_LOG = LOGS_DIR / "app.log"
+ERROR_LOG = LOGS_DIR / "error.log"
+ACCESS_LOG = LOGS_DIR / "access.log"
 
+def ensure_directories():
+    """Ensure all necessary directories exist"""
+    directories = [
+        LOGS_DIR,
+        UPLOADS_DIR,
+        IMAGES_DIR,
+        DATABASE_DIR,
+        BACKUP_DIR,
+        CONFIG_DIR
+    ]
 
-    def generate_app(self):
-        """Generates the complete Flask application structure and files based on configuration."""
-        self.app_output_path = Path(self.config['app_name'])
-        create_directory_structure(self.app_output_path)
+    for directory in directories:
+        directory.mkdir(parents=True, exist_ok=True)
 
-        # Generate core application files
-        write_file(self.app_output_path / "paths.py", generate_paths_file_content(self.config))
-        write_file(self.app_output_path / "app.py", generate_main_app_content(self.config))
-        write_file(self.app_output_path / ".env", generate_env_content(self.config))
-        write_file(self.app_output_path / "requirements.txt", generate_requirements_content(self.config))
-        write_file(self.app_output_path / "README.md", generate_readme_content(self.config))
+def get_upload_path(filename: str) -> Path:
+    """Get safe upload path for a filename"""
+    from utils.helpers import sanitize_filename
+    safe_filename = sanitize_filename(filename)
+    return UPLOADS_DIR / safe_filename
 
-        # Generate Route files
-        write_file(self.app_output_path / "routes" / "__init__.py", generate_routes_init_content())
-        write_file(self.app_output_path / "routes" / "main.py", generate_main_routes_content(self.config))
-        # API routes are optional, generate only if API endpoints feature is selected
-        if self.config['features']['api_endpoints']:
-            write_file(self.app_output_path / "routes" / "api.py", generate_api_routes_content(self.config))
-        else:
-            # If API is not chosen, ensure api.py is minimal or not generated
-            # For simplicity, we can generate a minimal one or just skip
-            # For now, let's generate an empty one if not needed to avoid import issues
-            write_file(self.app_output_path / "routes" / "api.py", "# API routes (feature not enabled)\nfrom flask import Blueprint\napi_bp = Blueprint('api', __name__, url_prefix='/api')\n")
+def get_log_path(log_type: str) -> Path:
+    """Get log file path by type"""
+    log_paths = {{
+        'app': APP_LOG,
+        'error': ERROR_LOG,
+        'access': ACCESS_LOG
+    }}
+    return log_paths.get(log_type, APP_LOG)
+
+# Initialize directories on import
+ensure_directories()
+'''
+    return paths_code
 
 
-        # Generate Utility files
-        write_file(self.app_output_path / "utils" / "__init__.py", generate_utils_init_content())
-        write_file(self.app_output_path / "utils" / "database.py", generate_database_utils_content(self.config))
-        write_file(self.app_output_path / "utils" / "helpers.py", generate_helpers_utils_content())
-        write_file(self.app_output_path / "utils" / "validators.py", generate_validators_utils_content())
+def generate_main_app_content(config: dict) -> str:
+    """Generate the main Flask application file content."""
+    app_title = config['app_title']
+    description = config['description']
+    author = config['author']
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        # Generate Template files
-        write_file(self.app_output_path / "templates" / "base.html", generate_base_template_content(self.config))
-        write_file(self.app_output_path / "templates" / "dashboard.html", generate_dashboard_template_content(self.config))
-        write_file(self.app_output_path / "templates" / "error.html", generate_error_template_content())
-        # This function handles creating multiple navigation-related template files
-        generate_nav_templates_content(self.app_output_path, self.config['nav_items'])
+    # Get use_postgres from config
+    # Ensure 'features' and 'database' keys exist and handle default if needed
+    use_postgres = config.get('features', {}).get('database', '') == 'PostgreSQL'
 
-        # Generate Static files
-        write_file(self.app_output_path / "static" / "css" / "custom.css", generate_custom_css_content(self.config))
-        write_file(self.app_output_path / "static" / "js" / "app.js", generate_app_js_content(self.config))
+    # Process nav_items_indented BEFORE constructing the main f-string
+    nav_items_raw = json.dumps(config['nav_items'], indent=4)
+    # Indent each line by 4 spaces for function body
+    nav_items_indented = textwrap.indent(nav_items_raw, ' ' * 4)
 
+    # *** CRITICAL FIX: Use single triple quotes (''') for the outer f-string
+    # to avoid conflict with """ inside the generated content. ***
+    return f'''"""
+{app_title}
+{description}
+
+Author: {author}
+Generated: {current_time}
+"""
+
+import os
+import logging
+from pathlib import Path
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from datetime import datetime
+
+# Import blueprints from the routes package
+from routes import register_blueprints
+
+# Import utilities
+from utils.database import init_db, get_db_connection, get_setting
+from utils.helpers import format_datetime
+import json
+
+# Path configuration
+from paths import BASE_DIR, LOGS_DIR
+
+{'from flask_sqlalchemy import SQLAlchemy' if use_postgres else ''}
+
+# Initialize Flask app
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Configuration
+app.config['APPLICATION_NAME'] = '{app_title}'
+app.config['DATABASE_PATH'] = BASE_DIR / 'data' / 'database.db'
+{'app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///" + str(app.config["DATABASE_PATH"]))' if use_postgres else ''}
+{'app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False' if use_postgres else ''}
+
+# Initialize extensions
+{'db = SQLAlchemy(app)' if use_postgres else ''}
+
+# Logging setup
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(LOGS_DIR / 'app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Register Blueprints
+register_blueprints(app)
+
+# Error handlers
+@app.errorhandler(404)
+def not_found(error):
+    logger.warning(f"404 Not Found: {{request.path}}")
+    return render_template('error.html', error="Page not found", code=404), 404
+
+@app.errorhandler(500)
+def server_error(error):
+    logger.exception(f"500 Internal Server Error: {{error}}")
+    return render_template('error.html', error="Internal server error", code=500), 500
+
+# Template context processors
+@app.context_processor
+def inject_globals():
+    """Inject global variables and functions into all templates"""
+    nav_items_data = {nav_items_indented}
+    return dict(
+        nav_items=nav_items_data,
+        app_title=app.config['APPLICATION_NAME'],
+        current_year=datetime.now().year,
+        get_setting=get_setting,
+        format_datetime=format_datetime
+    )
 
 if __name__ == '__main__':
-    wizard = FlaskWizard()
-    try:
-        wizard.run()
-    except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}")
-        print("Please check the traceback for more details.")
-        sys.exit(1)
+    with app.app_context():
+        init_db()
+        {'db.create_all()' if use_postgres else ''}
+
+    debug = os.environ.get('FLASK_ENV') == 'development'
+    port = int(os.environ.get('PORT', 5000))
+
+    logger.info(f"Starting {{app.config.get('APPLICATION_NAME', '{app_title}')}} on http://0.0.0.0:{{port}}")
+    app.run(debug=debug, port=port, host='0.0.0.0')
+'''
