@@ -45,179 +45,139 @@ def generate_readme_content(config: dict) -> str:
     description = config['description']
     author = config['author']
     current_year = datetime.now().year
-    
+
+    features = config.get('features', {})
+    nested = features.get('features', {})
+    database = features.get('database', 'sqlite')
+    user_auth = features.get('user_auth', nested.get('user_auth', False))
+    file_uploads = features.get('file_uploads', nested.get('file_uploads', False))
+    api_endpoints = features.get('api_endpoints', nested.get('api_endpoints', False))
+    background_tasks = features.get('background_tasks', nested.get('background_tasks', False))
+
     # Database description
     db_desc = 'PostgreSQL ready (with SQLite fallback for development)' if database == 'postgres_ready' else 'SQLite3 (lightweight, file-based database)'
-    
+
     # Feature selections
-    user_auth = 'Yes' if user_auth else 'No'
-    file_uploads = 'Yes' if file_uploads else 'No'
-    api_endpoints = 'Yes' if features.get('api_endpoints', nested.get('api_endpoints', False)) else 'No'
-    background_tasks = 'Yes' if config['features']['features']['background_tasks'] else 'No'
-    
-    readme_content = '''# ''' + app_title + '''
+    user_auth_str = 'Yes' if user_auth else 'No'
+    file_uploads_str = 'Yes' if file_uploads else 'No'
+    api_endpoints_str = 'Yes' if api_endpoints else 'No'
+    background_tasks_str = 'Yes' if background_tasks else 'No'
 
-## Overview
-
-''' + description + '''
-
-This project was generated using the Flask App Generator Wizard.
-
-## Features
-
-* **Modular Structure**: Organized into blueprints for clean code management.
-* **Database**: ''' + db_desc + '''
-* **Front-end**: Responsive UI with Bootstrap 5 and Bootstrap Icons.
-* **Configuration**: Environment variable based configuration using `.env`.
-* **Logging**: Basic application logging to console and file.
-
-### Selected Features:
-* **User Authentication**: ''' + user_auth + '''
-* **File Upload Handling**: ''' + file_uploads + '''
-* **REST API Endpoints**: ''' + api_endpoints + '''
-* **Background Task Support**: ''' + background_tasks + '''
-
-## Getting Started
-
-### 1. Clone the repository (or extract the generated app)
-
-```bash
-# If this was a git repo, you'd clone it
-# git clone https://github.com/your-repo/''' + app_name + '''.git
-# cd ''' + app_name + '''
-```
-
-### 2. Set up a virtual environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows use `venv\\Scripts\\activate`
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Set up environment variables
-
-Copy the `.env` file and adjust settings as needed:
-
-```bash
-cp .env .env.local  # Optional: create a local copy
-# Edit .env with your specific settings
-```
-
-### 5. Run the application
-
-```bash
-python app.py
-```
-
-The application will be available at `http://localhost:5000`
-
-## Project Structure
-
-```
-''' + app_name + '''/
-├── app.py                 # Main application entry point
-├── paths.py              # Path configurations
-├── requirements.txt      # Python dependencies
-├── .env                 # Environment variables
-├── routes/              # Route blueprints
-│   ├── __init__.py
-│   ├── main.py         # Main routes
-│   └── api.py          # API routes
-├── templates/          # Jinja2 templates
-│   ├── base.html
-│   ├── dashboard.html
-│   └── error.html
-├── static/            # Static files
-│   ├── css/
-│   │   └── custom.css
-│   ├── js/
-│   │   └── app.js
-│   ├── uploads/       # File uploads
-│   └── images/        # Static images
-├── utils/             # Utility modules
-│   ├── __init__.py
-│   ├── database.py    # Database utilities
-│   ├── helpers.py     # Helper functions
-│   └── validators.py  # Input validators
-├── data/              # Data storage
-│   └── backups/       # Database backups
-├── config/            # Configuration files
-└── logs/              # Application logs
-```
-
-## Configuration
-
-The application uses environment variables for configuration. Key settings in `.env`:
-
-* `FLASK_APP`: Application entry point
-* `FLASK_ENV`: Environment (development/production)
-* `SECRET_KEY`: Secret key for sessions
-* `DATABASE_URL`: Database connection string
-
-## Development
-
-### Adding New Routes
-
-1. Create route functions in `routes/main.py` or `routes/api.py`
-2. Add corresponding templates in `templates/`
-3. Update navigation in the base template if needed
-
-### Database Operations
-
-Database utilities are available in `utils/database.py`:
-
-```python
-from utils.database import get_db_connection, execute_query
-```
-
-### Styling
-
-Custom styles go in `static/css/custom.css`. The application uses Bootstrap 5 for base styling.
-
-## Deployment
-
-### Using Gunicorn
-
-```bash
-gunicorn --bind 0.0.0.0:8000 app:app
-```
-
-### Environment Variables for Production
-
-Set these environment variables in production:
-
-```bash
-FLASK_ENV=production
-SECRET_KEY=your-secret-key-here
-DATABASE_URL=your-database-url-here
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Author
-
-Created by ''' + author + ''' (''' + str(current_year) + ''')
-
----
-
-*Generated with Flask App Generator Wizard*
-'''
+    readme_content = (
+        f"# {app_title}\n\n"
+        "## Overview\n\n"
+        f"{description}\n\n"
+        "This project was generated using the Flask App Generator Wizard.\n\n"
+        "## Features\n\n"
+        "* **Modular Structure**: Organized into blueprints for clean code management.\n"
+        f"* **Database**: {db_desc}\n"
+        "* **Front-end**: Responsive UI with Bootstrap 5 and Bootstrap Icons.\n"
+        "* **Configuration**: Environment variable based configuration using `.env`.\n"
+        "* **Logging**: Basic application logging to console and file.\n\n"
+        "### Selected Features:\n"
+        f"* **User Authentication**: {user_auth_str}\n"
+        f"* **File Upload Handling**: {file_uploads_str}\n"
+        f"* **REST API Endpoints**: {api_endpoints_str}\n"
+        f"* **Background Task Support**: {background_tasks_str}\n\n"
+        "## Getting Started\n\n"
+        "### 1. Clone the repository (or extract the generated app)\n\n"
+        "```bash\n"
+        f"# If this was a git repo, you'd clone it\n# git clone https://github.com/your-repo/{app_name}.git\n# cd {app_name}\n"
+        "```\n\n"
+        "### 2. Set up a virtual environment\n\n"
+        "```bash\n"
+        "python3 -m venv venv\n"
+        "source venv/bin/activate  # On Windows use `venv\\Scripts\\activate`\n"
+        "```\n\n"
+        "### 3. Install dependencies\n\n"
+        "```bash\n"
+        "pip install -r requirements.txt\n"
+        "```\n\n"
+        "### 4. Set up environment variables\n\n"
+        "Copy the `.env` file and adjust settings as needed:\n\n"
+        "```bash\n"
+        "cp .env .env.local  # Optional: create a local copy\n"
+        "# Edit .env with your specific settings\n"
+        "```\n\n"
+        "### 5. Run the application\n\n"
+        "```bash\n"
+        "python app.py\n"
+        "```\n\n"
+        "The application will be available at `http://localhost:5000`\n\n"
+        "## Project Structure\n\n"
+        f"{app_name}/\n"
+        "├── app.py                 # Main application entry point\n"
+        "├── paths.py              # Path configurations\n"
+        "├── requirements.txt      # Python dependencies\n"
+        "├── .env                 # Environment variables\n"
+        "├── routes/              # Route blueprints\n"
+        "│   ├── __init__.py\n"
+        "│   ├── main.py         # Main routes\n"
+        "│   └── api.py          # API routes\n"
+        "├── templates/          # Jinja2 templates\n"
+        "│   ├── base.html\n"
+        "│   ├── dashboard.html\n"
+        "│   └── error.html\n"
+        "├── static/            # Static files\n"
+        "│   ├── css/\n"
+        "│   │   └── custom.css\n"
+        "│   ├── js/\n"
+        "│   │   └── app.js\n"
+        "│   ├── uploads/       # File uploads\n"
+        "│   └── images/        # Static images\n"
+        "├── utils/             # Utility modules\n"
+        "│   ├── __init__.py\n"
+        "│   ├── database.py    # Database utilities\n"
+        "│   ├── helpers.py     # Helper functions\n"
+        "│   └── validators.py  # Input validators\n"
+        "├── data/              # Data storage\n"
+        "│   └── backups/       # Database backups\n"
+        "├── config/            # Configuration files\n"
+        "└── logs/              # Application logs\n"
+        "```\n\n"
+        "## Configuration\n\n"
+        "The application uses environment variables for configuration. Key settings in `.env`:\n\n"
+        "* `FLASK_APP`: Application entry point\n"
+        "* `FLASK_ENV`: Environment (development/production)\n"
+        "* `SECRET_KEY`: Secret key for sessions\n"
+        "* `DATABASE_URL`: Database connection string\n\n"
+        "## Development\n\n"
+        "### Adding New Routes\n\n"
+        "1. Create route functions in `routes/main.py` or `routes/api.py`\n"
+        "2. Add corresponding templates in `templates/`\n"
+        "3. Update navigation in the base template if needed\n\n"
+        "### Database Operations\n\n"
+        "Database utilities are available in `utils/database.py`:\n\n"
+        "```python\n"
+        "from utils.database import get_db_connection, execute_query\n"
+        "```\n\n"
+        "### Styling\n\n"
+        "Custom styles go in `static/css/custom.css`. The application uses Bootstrap 5 for base styling.\n\n"
+        "## Deployment\n\n"
+        "### Using Gunicorn\n\n"
+        "```bash\n"
+        "gunicorn --bind 0.0.0.0:8000 app:app\n"
+        "```\n\n"
+        "### Environment Variables for Production\n\n"
+        "Set these environment variables in production:\n\n"
+        "```bash\n"
+        "FLASK_ENV=production\n"
+        "SECRET_KEY=your-secret-key-here\n"
+        "DATABASE_URL=your-database-url-here\n"
+        "```\n\n"
+        "## Contributing\n\n"
+        "1. Fork the repository\n"
+        "2. Create a feature branch (`git checkout -b feature/amazing-feature`)\n"
+        "3. Commit your changes (`git commit -m 'Add amazing feature'`)\n"
+        "4. Push to the branch (`git push origin feature/amazing-feature`)\n"
+        "5. Open a Pull Request\n\n"
+        "## License\n\n"
+        "This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.\n\n"
+        "## Author\n\n"
+        f"Created by {author} ({current_year})\n\n"
+        "---\n\n"
+        "*Generated with Flask App Generator Wizard*\n"
+    )
     return readme_content
 
 def generate_env_content(config: dict) -> str:
