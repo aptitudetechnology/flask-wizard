@@ -1,103 +1,117 @@
-# {app_title}
+# flask-app-wizard
 
-## Overview ###
-{description}
+## Overview
 
-This project was generated using the Flask App Generator Wizard.
+The Flask App Generator Wizard is a Python-based command-line tool designed to quickly scaffold new Flask web applications. It guides you through a series of interactive prompts to gather your desired application name, features (like user authentication, API endpoints, database type), and navigation structure. Once configured, it generates a complete, modular Flask project ready for development.
+
+This wizard aims to reduce boilerplate setup and provide a consistent, best-practice starting point for Flask projects.
 
 ## Features
-* **Modular Structure**: Organized into blueprints for clean code management.
-* **Database**: SQLite3 (lightweight, file-based database) or PostgreSQL ready (with SQLite fallback for development).
-* **Front-end**: Responsive UI with Bootstrap 5 and Bootstrap Icons.
-* **Configuration**: Environment variable based configuration using `.env`.
-* **Logging**: Basic application logging to console and file.
 
-### Selected Features:
-* **User Authentication**: Yes/No
-* **File Upload Handling**: Yes/No
-* **REST API Endpoints**: Yes/No
-* **Background Task Support**: Yes/No
-
----
+- **Interactive Prompts**: User-friendly questions to customize your app.
+- **Modular Design**: Generates a Flask app with a clear, organized directory structure using Blueprints, separating concerns for routes, templates, static files, and utilities.
+- **Configurable Database**: Choose between SQLite3 for simple, file-based projects or a PostgreSQL-ready setup with SQLAlchemy for more robust, scalable applications.
+- **Common Features**: Options to include basic user authentication, file upload handling, REST API endpoints, and background task support.
+- **Bootstrap 5 Integration**: Generated templates come with Bootstrap 5 and Bootstrap Icons for a modern, responsive UI.
+- **Environment Variable Support**: Uses `.env` files for easy configuration management.
+- **Logging**: Basic application logging configured out-of-the-box.
 
 ## Getting Started
 
-### 1. Clone the repository (or extract the generated app)
-```bash
-# If this was a git repo, you'd clone it
-# git clone [https://github.com/your-repo/](https://github.com/your-repo/){app_name}.git
-# cd {app_name}
+Follow these steps to set up and run the Flask App Generator Wizard.
 
-# If you just ran the wizard, navigate into the created directory:
-cd {app_name}
+### 1. Clone the Repository
+
+First, clone this wizard's repository to your local machine:
+
+```bash
+git clone https://github.com/your-username/flask-app-wizard.git
+cd flask-app-wizard
 ```
 
-### 2. Set up a virtual environment
-It's highly recommended to use a virtual environment to manage dependencies.
+### 2. Set Up a Virtual Environment
+
+It's highly recommended to use a virtual environment to manage the wizard's dependencies:
+
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
+
+Install the necessary Python packages for the wizard to run:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure environment variables
-Create a .env file in the root of the project based on .env.example.
-```ini
-# .env
-SECRET_KEY='your_super_secret_key_here_CHANGE_THIS'
-FLASK_ENV='development' # or 'production'
-# DATABASE_URL='postgresql://user:password@host:port/database_name' # Uncomment and configure for PostgreSQL
-```
+### 4. Run the Wizard
 
-### 5. Run the application
+Execute the main wizard script:
+
 ```bash
-python app.py
+python main_wizard.py
 ```
-The application should now be running at http://127.0.0.1:5000/.
 
-## Project Structure
+### 5. Follow the Prompts
+
+The wizard will ask you a series of questions:
+
+- **Basic Information**: App name, display title, description, and author.
+- **Navigation Setup**: Define the main navigation items for your dashboard.
+- **Features & Options**: Select your preferred database and optional features like user authentication, file uploads, API endpoints, and background tasks.
+
+After you confirm your choices, the wizard will generate your new Flask application in a directory named after your chosen app name.
+
+## Example Usage
+
+Here's an example of how you might interact with the wizard when running `python main_wizard.py`:
+
+```text
+Welcome to the Flask App Generator Wizard!
+
+App Name: my_flask_app
+Display Title: My Flask App
+Description: A sample Flask application
+Author: Jane Doe
+
+Select database (1) SQLite3 (2) PostgreSQL: 1
+Include user authentication? (y/n): y
+Include file uploads? (y/n): n
+Include REST API endpoints? (y/n): y
+Include background task support? (y/n): n
+
+Generating project files...
+Success! Your Flask app is ready in ./my_flask_app
 ```
-{app_name}/
-├── .env                  # Environment variables (copied from .env.example)
-├── app.py                # Main Flask application file
-├── paths.py              # Centralized path management
-├── requirements.txt      # Python dependencies
-├── README.md             # This file
-├── static/
-│   ├── css/
-│   │   └── custom.css    # Custom CSS styles
-│   ├── js/
-│   │   └── app.js        # Custom JavaScript
-│   ├── uploads/          # Directory for file uploads
-│   └── images/           # Directory for static images
-├── templates/
-│   ├── base.html         # Base Jinja2 template
-│   ├── dashboard.html    # Main dashboard page
-│   ├── error.html        # Error page template
-│   └── (other_nav_item_templates).html  # Templates for custom navigation items
-├── routes/               # Flask Blueprints for organized routing
-│   ├── __init__.py       # Registers blueprints
-│   ├── main.py           # Main application routes
-│   └── api.py            # REST API routes
-├── utils/                # Helper functions and utilities
-│   ├── __init__.py       # Initializes utilities
-│   ├── database.py       # Database connection and helper functions
-│   ├── helpers.py        # General utility functions
-│   └── validators.py     # Data validation functions
-├── logs/                 # Application logs
-└── data/                 # Database and other data files
-    ├── database.db       # SQLite database file (if used)
-    └── backups/          # Database backups
+
+## Project Structure (Wizard Itself)
+
+```
+flask-app-wizard/
+├── templates/          # Jinja2 templates used for generating Flask app structure
+├── static/             # Static assets for generated apps (CSS/JS/Icons)
+├── wizard/             # Core logic of the app generator
+│   ├── prompts.py      # Interactive CLI logic
+│   ├── generator.py    # File and directory generator
+│   └── utils.py        # Utility functions
+├── main_wizard.py      # Entry point for the CLI wizard
+├── requirements.txt    # Python package dependencies
+└── README.md           # Project overview and usage instructions
 ```
 
 ## Contributing
-Feel free to extend and customize this application. Contributions, issues, and feature requests are welcome!
+
+Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, please feel free to:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add new feature'`).
+5. Push to the branch (`git push origin feature/your-feature`).
+6. Open a Pull Request.
 
 ## License
-This project is licensed under the AGPL License - see the LICENSE.md file for details (if you have one).
 
-*Generated by Flask App Generator Wizard on July 29, 2025*
+This project is open-source and available under the [AGPL License](LICENSE).
