@@ -115,3 +115,8 @@ Contributions are welcome! If you have ideas for new features, improvements, or 
 ## License
 
 This project is open-source and available under the [AGPL License](LICENSE).
+
+screenshot:
+
+<img width="678" height="994" alt="image" src="https://github.com/user-attachments/assets/ae9df7be-7eef-4231-a6e6-d3546140350f" />
+
