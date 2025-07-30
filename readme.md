@@ -25,7 +25,7 @@ Follow these steps to set up and run the Flask App Generator Wizard.
 First, clone this wizard's repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/flask-app-wizard.git
+git clone https://github.com/aptitudetechnology/flask-wizard
 cd flask-app-wizard
 ```
 
