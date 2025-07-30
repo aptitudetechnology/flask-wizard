@@ -34,7 +34,7 @@ cd flask-app-wizard
 It's highly recommended to use a virtual environment to manage the wizard's dependencies:
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
