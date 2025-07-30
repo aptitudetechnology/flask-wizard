@@ -132,7 +132,7 @@ def generate_dashboard_template_content(config: dict) -> str:
 def generate_nav_templates_content(app_path: Path, nav_items: list):
     """Generate HTML templates for each custom navigation item."""
     for item in nav_items:
-        if item['route'] == '/' or item['name'].lower() == 'settings':
+        if item['route'] == '/':
             continue
 
         template_name = item['name'].lower().replace(' ', '_')
