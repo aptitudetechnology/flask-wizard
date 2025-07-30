@@ -13,12 +13,10 @@ from pathlib import Path
 from datetime import datetime
 
 # Import modules for different wizard stages
-# Assuming these files are in the same directory as main_wizard.py
 from wizard_prompts import gather_basic_info, gather_nav_info, gather_features, confirm_config
 from file_operations import create_directory_structure, write_file
 
 # Import functions from app_generator package
-# Ensure these modules and functions exist in your app_generator directory
 from app_generator.core import generate_main_app_content, generate_paths_file_content
 from app_generator.routes import generate_routes_init_content, generate_main_routes_content, generate_api_routes_content
 from app_generator.templates import generate_base_template_content, generate_dashboard_template_content, generate_nav_templates_content, generate_error_template_content
@@ -31,7 +29,6 @@ print("DEBUG: All imports complete.")
 class FlaskWizard:
     def __init__(self):
         self.config = {}
-        # This will be the path to the newly generated Flask app
         self.app_output_path = None
         print("DEBUG: FlaskWizard instance initialized.")
 
@@ -45,19 +42,22 @@ class FlaskWizard:
         self.config.update(gather_basic_info())
         self.config['nav_items'] = gather_nav_info()
         
-        # --- CORRECTED FEATURES PROCESSING BLOCK ---
-        features_data_from_prompts = gather_features() 
+        # --- START OF ROBUST FEATURES PROCESSING BLOCK (YOUR SUGGESTION) ---
+        features_data_from_prompts = gather_features()
         
-        # features_data_from_prompts['features'] is already a boolean dictionary
-        # from wizard_prompts.py, so we just extract its values directly to flatten.
+        # Safely get the 'features' dictionary, defaulting to an empty dict if not found
+        features_dict = features_data_from_prompts.get('features', {})
+        
         self.config['features'] = {
-            'database': features_data_from_prompts['database'], # e.g., 'sqlite' or 'postgres_ready'
-            'user_auth': features_data_from_prompts['features']['user_auth'],
-            'file_uploads': features_data_from_prompts['features']['file_uploads'],
-            'api_endpoints': features_data_from_prompts['features']['api_endpoints'],
-            'background_tasks': features_data_from_prompts['features']['background_tasks']
+            # Safely get 'database', defaulting to 'sqlite'
+            'database': features_data_from_prompts.get('database', 'sqlite'),
+            # Safely get each feature's boolean value, defaulting to False if not found
+            'user_auth': features_dict.get('user_auth', False),
+            'file_uploads': features_dict.get('file_uploads', False),
+            'api_endpoints': features_dict.get('api_endpoints', False),
+            'background_tasks': features_dict.get('background_tasks', False)
         }
-        # --- END OF CORRECTED FEATURES PROCESSING BLOCK ---
+        # --- END OF ROBUST FEATURES PROCESSING BLOCK ---
 
         # 2. Confirm Configuration
         if not confirm_config(self.config):
@@ -69,7 +69,7 @@ class FlaskWizard:
         self.generate_app()
 
         print(f"\n✅ Flask app '{self.config['app_name']}' created successfully!")
-        print(f"📁 Location: {self.app_output_path.resolve()}") # Use .resolve() for absolute path
+        print(f"📁 Location: {self.app_output_path.resolve()}")
         print(f"🚀 To run: cd {self.config['app_name']} && python app.py")
         print("\nDon't forget to create and activate a virtual environment!")
         print("Example: python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt")
