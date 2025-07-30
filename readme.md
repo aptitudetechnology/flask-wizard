@@ -1,6 +1,6 @@
 # flask-app-wizard
 
-## Overview
+## Overview ###
 
 The Flask App Generator Wizard is a Python-based command-line tool designed to quickly scaffold new Flask web applications. It guides you through a series of interactive prompts to gather your desired application name, features (like user authentication, API endpoints, database type), and navigation structure. Once configured, it generates a complete, modular Flask project ready for development.
 
