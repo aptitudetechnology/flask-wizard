@@ -43,7 +43,7 @@ class FlaskWizard:
         self.config['nav_items'] = gather_nav_info()
         
         # --- START OF ROBUST FEATURES PROCESSING BLOCK (YOUR SUGGESTION) ---
-        features_data_from_prompts = gather_features()
+        features_data_from_prompts = gather_features() or {} # Ensures it's always a dictionary
         
         # Safely get the 'features' dictionary, defaulting to an empty dict if not found
         features_dict = features_data_from_prompts.get('features', {})
