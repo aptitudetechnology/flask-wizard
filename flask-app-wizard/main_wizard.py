@@ -22,7 +22,9 @@ from app_generator.routes import generate_routes_init_content, generate_main_rou
 from app_generator.templates import generate_base_template_content, generate_dashboard_template_content, generate_nav_templates_content, generate_error_template_content
 from app_generator.utils import generate_utils_init_content, generate_database_utils_content, generate_helpers_utils_content, generate_validators_utils_content
 from app_generator.static import generate_custom_css_content, generate_app_js_content
-from app_generator.misc import generate_requirements_content, generate_readme_content, generate_env_content
+from app_generator.misc import generate_requirements_content, generate_readme_content, generate_env_content, generate_settings_content  
+
+
 
 print("DEBUG: All imports complete.")
 
@@ -87,6 +89,7 @@ class FlaskWizard:
         write_file(self.app_output_path / ".env", generate_env_content(self.config))
         write_file(self.app_output_path / "requirements.txt", generate_requirements_content(self.config))
         write_file(self.app_output_path / "README.md", generate_readme_content(self.config))
+        write_file(self.app_output_path / "settings.py", generate_settings_content(self.config))
 
         # Generate Route files
         write_file(self.app_output_path / "routes" / "__init__.py", generate_routes_init_content())
