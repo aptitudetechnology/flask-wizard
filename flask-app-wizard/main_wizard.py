@@ -5,7 +5,7 @@ This script guides the user through creating a new Flask application,
 gathering configuration, and then generating the project files.
 """
 
-print("DEBUG: Script started.") # <--- ADD THIS LINE
+print("DEBUG: Script started.") 
 
 import sys
 import json
@@ -26,14 +26,14 @@ from app_generator.utils import generate_utils_init_content, generate_database_u
 from app_generator.static import generate_custom_css_content, generate_app_js_content
 from app_generator.misc import generate_requirements_content, generate_readme_content, generate_env_content
 
-print("DEBUG: All imports complete.") # <--- ADD THIS LINE
+print("DEBUG: All imports complete.")
 
 class FlaskWizard:
     def __init__(self):
         self.config = {}
         # This will be the path to the newly generated Flask app
         self.app_output_path = None
-        print("DEBUG: FlaskWizard instance initialized.") # <--- ADD THIS LINE
+        print("DEBUG: FlaskWizard instance initialized.")
 
     def run(self):
         """Main wizard flow for generating a Flask application."""
@@ -45,22 +45,20 @@ class FlaskWizard:
         self.config.update(gather_basic_info())
         self.config['nav_items'] = gather_nav_info()
         
-        features_data_raw = gather_features() # Get the raw data from gather_features
-
-        # --- START OF MODIFIED SECTION ---
-        # Process features_data_raw into the desired boolean dictionary format
+        # --- CORRECTED FEATURES PROCESSING BLOCK ---
+        features_data_from_prompts = gather_features() 
+        
+        # features_data_from_prompts['features'] is already a boolean dictionary
+        # from wizard_prompts.py, so we just extract its values directly to flatten.
         self.config['features'] = {
-            'database': features_data_raw['database'], # Database selection is likely a string
-            # Check if each feature is present in the list of selected features
-            'user_auth': 'User Auth' in features_data_raw['features'],
-            'file_uploads': 'File Uploads' in features_data_raw['features'],
-            'api_endpoints': 'API Endpoints' in features_data_raw['features'],
-            'background_tasks': 'Background Tasks' in features_data_raw['features']
+            'database': features_data_from_prompts['database'], # e.g., 'sqlite' or 'postgres_ready'
+            'user_auth': features_data_from_prompts['features']['user_auth'],
+            'file_uploads': features_data_from_prompts['features']['file_uploads'],
+            'api_endpoints': features_data_from_prompts['features']['api_endpoints'],
+            'background_tasks': features_data_from_prompts['features']['background_tasks']
         }
-        # --- END OF MODIFIED SECTION ---
+        # --- END OF CORRECTED FEATURES PROCESSING BLOCK ---
 
-        # 2. Confirm Configuration
-        # ... (rest of the run method remains the same)
         # 2. Confirm Configuration
         if not confirm_config(self.config):
             print("\nAborted by user. No files were generated.")
@@ -79,7 +77,7 @@ class FlaskWizard:
 
     def generate_app(self):
         """Generates the complete Flask application structure and files based on configuration."""
-        print("DEBUG: Entering generate_app().") # <--- ADD THIS LINE
+        print("DEBUG: Entering generate_app().")
         self.app_output_path = Path(self.config['app_name'])
         create_directory_structure(self.app_output_path)
 
@@ -120,7 +118,7 @@ class FlaskWizard:
 
 
 if __name__ == '__main__':
-    print("DEBUG: Entering __name__ == '__main__' block.") # <--- ADD THIS LINE
+    print("DEBUG: Entering __name__ == '__main__' block.")
     wizard = FlaskWizard()
     try:
         wizard.run()
