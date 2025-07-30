@@ -281,7 +281,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
     SESSION_COOKIE_SECURE = os.environ.get('FLASK_ENV') == 'production'
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax''''
+    SESSION_COOKIE_SAMESITE = 'Lax'''
 
     if background_tasks:
         settings_content += '''
