@@ -35,7 +35,16 @@ class FlaskWizard:
         # 1. Gather User Information
         self.config.update(gather_basic_info())
         self.config['nav_items'] = gather_nav_info()
-        self.config['features'] = gather_features()
+        features_data = gather_features()
+        
+        # Flatten the features structure for compatibility with generators
+        self.config['features'] = {
+            'database': features_data['database'],
+            'user_auth': features_data['features']['user_auth'],
+            'file_uploads': features_data['features']['file_uploads'],
+            'api_endpoints': features_data['features']['api_endpoints'],
+            'background_tasks': features_data['features']['background_tasks']
+        }
 
         # 2. Confirm Configuration
         if not confirm_config(self.config):
