@@ -164,13 +164,13 @@ def server_error(error):
 @app.context_processor
 def inject_globals():
     """Inject global variables and functions into all templates"""
-    nav_items_data = {nav_items_json} # Use the actual config value
+   nav_items_data = [...]  # actual list of nav items
     return dict(
-        nav_items=json.loads(nav_items_data), # Parse back to Python object for template
-        app_title=app.config['APPLICATION_NAME'],
-        current_year=datetime.now().year,
-        get_setting=get_setting, # Make get_setting available in templates
-        format_datetime=format_datetime # Make format_datetime available in templates
+    nav_items=nav_items_data,
+    app_title=app.config['APPLICATION_NAME'],
+    current_year=datetime.now().year,
+    get_setting=get_setting,
+    format_datetime=format_datetime
     )
 
 if __name__ == '__main__':

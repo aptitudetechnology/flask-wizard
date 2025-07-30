@@ -1,0 +1,1 @@
+The template generator should always create a placeholder settings.html template in the templates directory. This can be done by adding logic to generate a basic settings.html file, even if "Settings" is skipped in the navigation loop. The template should extend base.html and provide a simple content block for settings.
