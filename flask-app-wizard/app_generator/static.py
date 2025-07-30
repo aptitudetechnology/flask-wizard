@@ -7,7 +7,6 @@ def generate_custom_css_content(config: dict) -> str:
     """Generate custom.css file content."""
     app_title = config['app_title']
     custom_css = '''/* Custom styles for ''' + app_title + ''' */
-
 :root {
     --primary-color: #0d6efd;
     --secondary-color: #6c757d;
@@ -75,7 +74,6 @@ def generate_app_js_content(config: dict) -> str:
     """Generate app.js file content."""
     app_title = config['app_title']
     app_js = '''// ''' + app_title + ''' JavaScript
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log('''' + app_title + ''' loaded successfully');
 
@@ -104,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Utility functions
 function showToast(message, type = 'info') {
     // Create a simple toast notification
-    const toastContainer = document.querySelector('.toast-container');
+    let toastContainer = document.querySelector('.toast-container');
     if (!toastContainer) {
         // Create container if it doesn't exist
         const newToastContainer = document.createElement('div');
@@ -120,7 +118,6 @@ function showToast(message, type = 'info') {
         <div>${message}</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-
     toastContainer.appendChild(toastElement);
 
     // Auto-hide after 3 seconds
