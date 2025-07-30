@@ -91,6 +91,9 @@ def generate_main_app_content(config: dict) -> str:
     use_postgres = config['features']['database'] == 'postgres_ready'
     use_user_auth = config['features']['user_auth']
 
+    # Handle nav_items JSON serialization properly
+    nav_items_json = json.dumps(config['nav_items'], indent=8)
+
     app_code = f'''"""
 {app_title}
 {description}
@@ -124,7 +127,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-producti
 # Configuration
 app.config['APPLICATION_NAME'] = '{app_title}'
 app.config['DATABASE_PATH'] = BASE_DIR / 'data' / 'database.db' # SQLite path
-{'app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///{app.config["DATABASE_PATH"]}")' if use_postgres else ''}
+{'app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", f"sqlite:///' + '{app.config["DATABASE_PATH"]}")' if use_postgres else ''}
 {'app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False' if use_postgres else ''}
 
 # Initialize extensions
@@ -148,19 +151,19 @@ register_blueprints(app)
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
-    logger.warning(f"404 Not Found: {request.path}")
+    logger.warning(f"404 Not Found: {{request.path}}")
     return render_template('error.html', error="Page not found", code=404), 404
 
 @app.errorhandler(500)
 def server_error(error):
-    logger.exception(f"500 Internal Server Error: {error}")
+    logger.exception(f"500 Internal Server Error: {{error}}")
     return render_template('error.html', error="Internal server error", code=500), 500
 
 # Template context processors
 @app.context_processor
 def inject_globals():
     """Inject global variables and functions into all templates"""
-    nav_items_data = {json.dumps(config['nav_items'], indent=8)} # Use the actual config value
+    nav_items_data = {nav_items_json} # Use the actual config value
     return dict(
         nav_items=json.loads(nav_items_data), # Parse back to Python object for template
         app_title=app.config['APPLICATION_NAME'],
@@ -178,7 +181,7 @@ if __name__ == '__main__':
     debug = os.environ.get('FLASK_ENV') == 'development'
     port = int(os.environ.get('PORT', 5000))
 
-    logger.info(f"Starting {app.config.get('APPLICATION_NAME', '{app_title}')} on http://0.0.0.0:{port}")
+    logger.info(f"Starting {{app.config.get('APPLICATION_NAME', '{app_title}')}} on http://0.0.0.0:{{port}}")
     app.run(debug=debug, port=port, host='0.0.0.0')
 '''
     return app_code
