@@ -118,6 +118,8 @@ class FlaskWizard:
         # Generate Static files
         write_file(self.app_output_path / "static" / "css" / "custom.css", generate_custom_css_content(self.config))
         write_file(self.app_output_path / "static" / "js" / "app.js", generate_app_js_content(self.config))
+        # Add this line with your other core application files
+        write_file(self.app_output_path / "settings.py", generate_settings_content(self.config))
 
 
 if __name__ == '__main__':
